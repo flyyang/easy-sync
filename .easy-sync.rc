@@ -1,0 +1,10 @@
+test:
+  host: 192.168.45.1
+  port: 22
+  path: /var/www/app
+  local-path: ~/app
+dev
+  host: 192.168.90.150
+  port: 6666
+  path: /var/www/app
+  local-path: ~/app
