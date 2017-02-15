@@ -8,3 +8,8 @@ dev
   port: 6666
   path: /var/www/app
   local-path: ~/app
+dgo:
+  host: 136.68.47.92
+  port: 22
+  path: ~
+  password: yunshan3302

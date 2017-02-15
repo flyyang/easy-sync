@@ -24,6 +24,7 @@
   "homepage": "https://github.com/flyyang/easy-sync#readme",
   "dependencies": {
     "chokidar": "^1.6.1",
+    "colors": "^1.1.2",
     "commander": "^2.9.0",
     "js-yaml": "^3.8.1"
   },
