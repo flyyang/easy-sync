@@ -25,22 +25,22 @@ if (!path2) {
 
 if (program.sync) {
 
-	const watcher = chokidar.watch(path2, {
+  const watcher = chokidar.watch(path2, {
     ignored: /(^|[/\\])\..|node_modules\/|vendor\//,
     persistent: true,
     ignorePermissionErrors: true,
-		cwd: '.'
+    cwd: '.'
   })
 
   watcher
     .on('change', path => {
-			path3 = path2.substring(path2.lastIndexOf('/'))
-			const relativePath = path.substring(path3.length + path.lastIndexOf(path3))
+      path3 = path2.substring(path2.lastIndexOf('/'))
+      const relativePath = path.substring(path3.length + path.lastIndexOf(path3))
       const cmd = `sshpass -p yunshan3302 scp -P 61209 ${path} root@192.168.42.153:/var/www/lcweb${relativePath}`
 
-			console.log(colors.green(cmd))
+      console.log(colors.green(cmd))
       exec(cmd, (error, stdout, stderr) => {
-				if (error !== null) {
+        if (error !== null) {
             console.log(`exec error: ${error}`);
         }
       })
