@@ -12,18 +12,26 @@ function parseConf() {
   console.log(confDefaultPath)
   if (!confExists()) {
     console.log('')
-    console.log('x'.bold.red, '.easy-syn.rc not found in user home path'.red)
+    console.log('x'.bold.red, ' .easy-syn.rc not found in user home path'.red)
     console.log('')
     process.exit(1)
   }
+  let conf = {}
   try {
-    const doc = parser.safeLoad(fs.readFileSync(confDefaultPath, 'utf8'))
-    console.log(doc)
+    conf = parser.safeLoad(fs.readFileSync(confDefaultPath, 'utf8'))
   } catch (e) {
+    console.log('x'.bold.red, ' seems .easy-sync.rc have syntax error'.red)
     console.log(e)
+    process.exit(1);
   }
+  return conf
 }
+
+const raw = parseConf()
+const sessions = Object.keys(raw)
+
 module.exports = {
-  confExists,
   parseConf,
+  raw,
+  sessions,
 }

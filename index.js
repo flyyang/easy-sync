@@ -11,6 +11,7 @@ program
   .option('-l, --lint', 'linting src')
   .option('-s, --sync', 'sync with dst server')
   .option('-p, --path [path]', 'watched path')
+  .option('-S, --ssh [session]', 'watched path')
   .on('--help', () => {
     console.log('   Examples')
     console.log('')
@@ -20,7 +21,8 @@ program
 
 const path2 = program.path
 
-conf.parseConf()
+console.log(conf.sessions)
+
 process.exit()
 if (!path2) {
   program.help()
