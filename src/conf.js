@@ -9,7 +9,6 @@ function confExists() {
 }
 
 function parseConf() {
-  console.log(confDefaultPath)
   if (!confExists()) {
     console.log('')
     console.log('x'.bold.red, ' .easy-syn.rc not found in user home path'.red)
@@ -22,9 +21,14 @@ function parseConf() {
   } catch (e) {
     console.log('x'.bold.red, ' seems .easy-sync.rc have syntax error'.red)
     console.log(e)
-    process.exit(1);
+    process.exit(1)
   }
   return conf
+}
+
+function check() {
+  // check session
+
 }
 
 const raw = parseConf()
@@ -34,4 +38,5 @@ module.exports = {
   parseConf,
   raw,
   sessions,
+  check,
 }

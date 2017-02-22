@@ -4,29 +4,30 @@ const program = require('commander')
 const chokidar = require('chokidar')
 const exec = require('child_process').exec
 const colors = require('colors')
-const conf = require('./src/check-conf.js')
+const conf = require('./src/conf.js')
+const ssh = require('./src/ssh.js')
+const logger = require('./src/logger.js')
 
 program
   .version('0.0.1')
-  .option('-l, --lint', 'linting src')
-  .option('-s, --sync', 'sync with dst server')
-  .option('-p, --path [path]', 'watched path')
-  .option('-S, --ssh [session]', 'watched path')
+  .option('-s, --sync', 'action: sync')
+  .option('-S, --ssh', 'action: ssh')
+  .option('-n, --session-name [name]', 'session name')
   .on('--help', () => {
     console.log('   Examples')
     console.log('')
-    console.log('     $ easy-sync -s -p /var/www/app')
+    console.log('     $ easy-sync -s -n dev')
   })
   .parse(process.argv)
 
+conf.check()
+
 const path2 = program.path
 
-console.log(conf.sessions)
+if (process.argv.length === 2) program.help()
+if (!program.sessionName) logger.error('session name is required')
 
-process.exit()
-if (!path2) {
-  program.help()
-}
+if (program.ssh) ssh.login(program.sessionName)
 
 if (program.sync) {
   const watcher = chokidar.watch(path2, {
@@ -40,7 +41,7 @@ if (program.sync) {
     .on('change', (path) => {
       const path3 = path2.substring(path2.lastIndexOf('/'))
       const relativePath = path.substring(path3.length + path.lastIndexOf(path3))
-      const cmd = `sshpass -p yunshan3302 scp -P 61209 ${path} root@192.168.42.153:/var/www/lcweb${relativePath}`
+      const cmd = `sshpass -p yunshan3302 scp -P 61209 ${path} root@192.168.42.153:/var/www/lcweb_bss${relativePath}`
 
       console.log(colors.green(cmd))
       exec(cmd, (error) => {
