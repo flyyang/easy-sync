@@ -1,7 +1,7 @@
 const parser = require('js-yaml')
 const fs = require('fs')
 const os = require('os')
-
+const logger = require('./logger.js')
 const confDefaultPath = `${os.homedir()}/.easy-sync.rc`
 
 function confExists() {
@@ -10,33 +10,29 @@ function confExists() {
 
 function parseConf() {
   if (!confExists()) {
-    console.log('')
-    console.log('x'.bold.red, ' .easy-syn.rc not found in user home path'.red)
-    console.log('')
-    process.exit(1)
+    logger.error('.easy-syn.rc not found in user home path')
   }
   let conf = {}
   try {
     conf = parser.safeLoad(fs.readFileSync(confDefaultPath, 'utf8'))
   } catch (e) {
-    console.log('x'.bold.red, ' seems .easy-sync.rc have syntax error'.red)
-    console.log(e)
-    process.exit(1)
+    logger.error('seems ~/.easy-sync.rc have syntax error');
   }
   return conf
 }
 
-function check() {
-  // check session
+function check(sessionName) {
+  if (!(sessionName in raw)) logger.error('session not found in conf')
+}
 
+function getSession() {
+  
 }
 
 const raw = parseConf()
-const sessions = Object.keys(raw)
 
 module.exports = {
-  parseConf,
   raw,
-  sessions,
   check,
+  getSession,
 }
