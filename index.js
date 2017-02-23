@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
 const program = require('commander')
-const chokidar = require('chokidar')
-const exec = require('child_process').exec
-const colors = require('colors')
 const ssh = require('./src/ssh.js')
 const sync = require('./src/sync.js')
 const logger = require('./src/logger.js')
@@ -23,4 +20,4 @@ program
 if (process.argv.length === 2) program.help()
 if (!program.sessionName) logger.error('session name is required')
 if (program.ssh && !program.sync) ssh.login(program.sessionName)
-if (program.sync && !program.ssh) ssh.sync(program.sessionName)
+if (program.sync && !program.ssh) sync.sync(program.sessionName)

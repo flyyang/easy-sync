@@ -11,7 +11,14 @@ function success(msg) {
   console.log(colors.green(msg))
 }
 
+function rainbow(msg) {
+  console.log('')
+  console.log(colors.rainbow(msg))
+  console.log('')
+}
+
 module.exports = {
   error,
   success,
+  rainbow,
 }
