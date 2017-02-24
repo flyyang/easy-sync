@@ -39,4 +39,5 @@ function getSession(sessionName) {
 
 module.exports = {
   getSession,
+  parseConf,
 }

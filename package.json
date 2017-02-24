@@ -26,8 +26,7 @@
     "chokidar": "^1.6.1",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
-    "js-yaml": "^3.8.1",
-    "nodemiral": "^1.1.1"
+    "js-yaml": "^3.8.1"
   },
   "devDependencies": {
     "eslint": "^3.15.0",
