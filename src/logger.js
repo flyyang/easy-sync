@@ -1,10 +1,12 @@
 const colors = require('colors')
 
-function error(msg) {
+function error(msg, exit = true) {
   console.log('')
   console.log(colors.bold.red('x'), colors.red(msg))
   console.log('')
-  process.exit(1)
+  if (exit) {
+    process.exit(1)
+  }
 }
 
 function success(msg) {

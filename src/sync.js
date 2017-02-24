@@ -36,7 +36,7 @@ ${user}@${host}:${remotePath}${relativePath}`
 
       exec(cmd, (error) => {
         if (error !== null) {
-          logger.error(`exec error: ${error}`)
+          logger.error(`exec error: ${error}`, false)
         }
         logger.rainbow('copy files success')
       })
