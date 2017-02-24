@@ -22,7 +22,7 @@ function sync(sessionName) {
     ignorePermissionErrors: true,
     cwd: '.',
   })
-
+  logger.success(`Watching path ${localPath}`)
   watcher
     .on('change', (path) => {
       const lastDirName = localPath.substring(

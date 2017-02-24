@@ -30,7 +30,7 @@ password? Sounds nice!
 ### install the tool
 
 ```
-npm install -g easy-sync
+npm install -g easy-sync2
 ```
 
 ### config your sessions /root/.easy-sync.rc
