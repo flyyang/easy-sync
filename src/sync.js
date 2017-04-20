@@ -32,25 +32,25 @@ function sync(sessionName) {
     })
     .on('error', error => console.log(`${error}`))
 
+  function syncFile(path){
+      const lastDirName = localPath.substring(
+        localPath.trim('/').lastIndexOf('/'))
+      const relativePath = path.substring(lastDirName.length
+        + path.lastIndexOf(lastDirName))
+      const cmd = `sshpass -p ${password} scp -P ${port} ${path} \
+  ${user}@${host}:${remotePath}${relativePath}`
+
+      logger.success(`copy from ${path} to ${remotePath}${relativePath}`)
+
+      exec(cmd, (error) => {
+        if (error !== null) {
+          logger.error(`exec error: ${error}`, false)
+        }
+        logger.rainbow('copy files success')
+      })
+  }
 }
 
-function syncFile(path){
-    const lastDirName = localPath.substring(
-      localPath.trim('/').lastIndexOf('/'))
-    const relativePath = path.substring(lastDirName.length
-      + path.lastIndexOf(lastDirName))
-    const cmd = `sshpass -p ${password} scp -P ${port} ${path} \
-${user}@${host}:${remotePath}${relativePath}`
-
-    logger.success(`copy from ${path} to ${remotePath}${relativePath}`)
-
-    exec(cmd, (error) => {
-      if (error !== null) {
-        logger.error(`exec error: ${error}`, false)
-      }
-      logger.rainbow('copy files success')
-    })
-}
 
 module.exports = {
   sync,
