@@ -3,6 +3,26 @@ const logger = require('./logger.js')
 const exec = require('child_process').exec
 const conf = require('./conf.js')
 
+function onAdd() {
+
+}
+
+function onAddDir() {
+
+}
+
+function onChange() {
+
+}
+
+function onUnlink() {
+
+}
+
+function onUnlinkDir() {
+
+}
+
 function sync(sessionName) {
   if (!sessionName) logger.error('session name is required')
   const session = conf.getSession(sessionName)
