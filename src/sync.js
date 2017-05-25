@@ -16,6 +16,24 @@ function sync(sessionName) {
     password,
   } = session
 
+  function syncFile(path) {
+    const lastDirName = localPath.substring(
+      localPath.trim('/').lastIndexOf('/'))
+    const relativePath = path.substring(lastDirName.length
+      + path.lastIndexOf(lastDirName))
+    const cmd = `sshpass -p ${password} scp -o StrictHostKeyChecking=no \
+-P ${port} ${path} ${user}@${host}:${remotePath}${relativePath}`
+    logger.success(cmd)
+    logger.success(`copy from ${path} to ${remotePath}${relativePath}`)
+
+    exec(cmd, (error) => {
+      if (error !== null) {
+        logger.error(`exec error: ${error}`, false)
+      }
+      logger.rainbow('copy files success')
+    })
+  }
+
   const watcher = chokidar.watch(localPath.replace('~', '/root'), {
     ignored: /(^|[/\\])\..|node_modules\/|vendor\/|.git\//,
     persistent: true,
@@ -31,24 +49,6 @@ function sync(sessionName) {
       syncFile(path)
     })
     .on('error', error => console.log(`${error}`))
-
-  function syncFile(path){
-      const lastDirName = localPath.substring(
-        localPath.trim('/').lastIndexOf('/'))
-      const relativePath = path.substring(lastDirName.length
-        + path.lastIndexOf(lastDirName))
-      const cmd = `sshpass -p ${password} scp -P ${port} ${path} \
-  ${user}@${host}:${remotePath}${relativePath}`
-
-      logger.success(`copy from ${path} to ${remotePath}${relativePath}`)
-
-      exec(cmd, (error) => {
-        if (error !== null) {
-          logger.error(`exec error: ${error}`, false)
-        }
-        logger.rainbow('copy files success')
-      })
-  }
 }
 
 
