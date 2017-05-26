@@ -10,7 +10,18 @@ function error(msg, exit = true) {
 }
 
 function success(msg) {
-  console.log(colors.green(msg))
+  console.log('')
+  const rainbowMsg = /(\[.*\])(.+)$/.exec(msg)
+  if (rainbowMsg !== null) {
+    console.log(
+      colors.green('√'),
+      colors.rainbow(rainbowMsg[1]),
+      // eslint-disable-next-line comma-dangle
+      colors.green(rainbowMsg[2])
+    )
+  } else {
+    console.log(colors.green('√', msg))
+  }
 }
 
 function rainbow(msg) {

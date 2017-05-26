@@ -10,6 +10,7 @@ program
   .option('-s, --sync', 'action: sync')
   .option('-S, --ssh', 'action: ssh')
   .option('-l, --list', 'list all session')
+  .option('-i, --init', 'sync first time')
   .option('-n, --session-name [name]', 'session name')
   .on('--help', () => {
     console.log('   Examples')
@@ -22,3 +23,4 @@ if (process.argv.length === 2) program.help()
 if (program.ssh && !program.sync) ssh.login(program.sessionName)
 if (program.sync && !program.ssh) sync.sync(program.sessionName)
 if (program.list) list.ls(program.sessionName)
+if (program.init) sync.sync(program.sessionName, program.init)

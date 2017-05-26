@@ -3,32 +3,23 @@ const logger = require('./logger.js')
 const exec = require('child_process').exec
 const conf = require('./conf.js')
 
-function onAdd() {
-
+function execCmd(cmd, successMsg) {
+  if (!cmd) return
+  exec(cmd, (error) => {
+    if (error !== null) {
+      logger.error(`exec error: ${error}`, false)
+    }
+    logger.success(successMsg)
+  })
 }
 
-function onAddDir() {
 
-}
-
-function onChange() {
-
-}
-
-function onUnlink() {
-
-}
-
-function onUnlinkDir() {
-
-}
-
-function sync(sessionName) {
-  if (!sessionName) logger.error('session name is required')
-  const session = conf.getSession(sessionName)
+function prepareCmd(path, session, type, extraCmd = '') {
+  // vim create a 4913 temp file
+  // see: https://groups.google.com/forum/#!msg/vim_dev/sppdpElxY44/v9fOtS1ji-cJ
+  if (/4913$/.test(path)) return
 
   const {
-    'local-path': localPath,
     'remote-path': remotePath,
     host,
     user,
@@ -36,37 +27,110 @@ function sync(sessionName) {
     password,
   } = session
 
-  function syncFile(path) {
-    const lastDirName = localPath.substring(
-      localPath.trim('/').lastIndexOf('/'))
-    const relativePath = path.substring(lastDirName.length
-      + path.lastIndexOf(lastDirName))
-    const cmd = `sshpass -p ${password} scp -o StrictHostKeyChecking=no \
--P ${port} ${path} ${user}@${host}:${remotePath}${relativePath}`
-    logger.success(cmd)
-    logger.success(`copy from ${path} to ${remotePath}${relativePath}`)
+  const sshpassCmd = `sshpass -p ${password} `
+  let cmd = ''
+  if (type === 'ssh') {
+    cmd = `ssh -p ${port}  -o StrictHostKeyChecking=no ${user}@${host}`
+  } else if (type === 'scp') {
+    cmd = `scp -o StrictHostKeyChecking=no -P ${port} ${path} \
+    ${user}@${host}:${remotePath}/${path}`
+  }
+  // eslint-disable-next-line consistent-return
+  return sshpassCmd + cmd + extraCmd
+}
 
-    exec(cmd, (error) => {
-      if (error !== null) {
-        logger.error(`exec error: ${error}`, false)
-      }
-      logger.rainbow('copy files success')
-    })
+function onAdd(path, session) {
+  const cmd = prepareCmd(path, session, 'scp')
+  console.log(cmd)
+  execCmd(cmd, `[add file] in remote server \
+${session['remote-path']}/${path}`)
+}
+
+function onChange(path, session) {
+  const cmd = prepareCmd(path, session, 'scp')
+  execCmd(cmd, `[change file] applied in remote server \
+${session['remote-path']}/${path}`)
+}
+
+function onAddDir(path, session) {
+  const extraCmd = ` "mkdir -p ${session['remote-path']}/${path} "`
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  execCmd(cmd, ` [add directory] success in remote server \
+${session['remote-path']}/${path}`)
+}
+
+
+function onUnlink(path, session) {
+  const extraCmd = ` " yes | rm  ${session['remote-path']}/${path} "`
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  execCmd(cmd, ` [delete file] in remote server \
+${session['remote-path']}/${path}`)
+}
+
+function onUnlinkDir(path, session) {
+  const extraCmd = ` " rm -rf ${session['remote-path']}/${path} "`
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  execCmd(cmd, `[delete directory] in remote server \
+${session['remote-path']}/${path}`)
+}
+
+function initRemote(session) {
+  const {
+    'remote-path': remotePath,
+    'local-path': localPath,
+    host,
+    user,
+    port,
+    password,
+  } = session
+
+  const nomalizedRemotePath = remotePath.replace(/\/$/, '').replace('~', '/root')
+  const arr = nomalizedRemotePath.split('/')
+  arr.pop()
+  const newPath = arr.join('/')
+
+  const cmd = `sshpass -p ${password} scp -P ${port} -r ${localPath}\
+    -o StrictHostKeyChecking=no ${user}@${host}:${newPath}`
+  logger.success("[warning]... it may taker a while cause some directory like \
+node_moules, vendor etc...")
+  logger.success("consider use rysnc in next release")
+  execCmd(cmd, '[init] remote server success')
+}
+
+function sync(sessionName, init) {
+  if (!sessionName) logger.error('session name is required')
+  const session = conf.getSession(sessionName)
+
+  if (init) {
+    initRemote(session)
+    return
   }
 
-  const watcher = chokidar.watch(localPath.replace('~', '/root'), {
+  const watcher = chokidar.watch(session['local-path'].replace('~', '/root'), {
     ignored: /(^|[/\\])\..|node_modules\/|vendor\/|.git\//,
     persistent: true,
     ignorePermissionErrors: true,
+    ignoreInitial: true,
     cwd: '.',
   })
-  logger.success(`Watching path ${localPath}`)
+
+  logger.success(`Watching path ${session['local-path']}`)
+
   watcher
     .on('change', (path) => {
-      syncFile(path)
+      onChange(path, session)
     })
     .on('add', (path) => {
-      syncFile(path)
+      onAdd(path, session)
+    })
+    .on('addDir', (path) => {
+      onAddDir(path, session)
+    })
+    .on('unlink', (path) => {
+      onUnlink(path, session)
+    })
+    .on('unlinkDir', (path) => {
+      onUnlinkDir(path, session)
     })
     .on('error', error => console.log(`${error}`))
 }
