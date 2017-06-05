@@ -8,19 +8,30 @@ function execCmd(cmd, successMsg) {
   exec(cmd, (error) => {
     if (error !== null) {
       logger.error(`exec error: ${error}`, false)
+    } else {
+      logger.success(successMsg)
     }
-    logger.success(successMsg)
   })
 }
 
+function getRelativePath(localPath, path) {
+  const lastDirName = localPath.substring(localPath.trim('/').lastIndexOf('/'))
+  const relativePath = path.substring(lastDirName.length
+    + path.lastIndexOf(lastDirName))
+
+  return relativePath
+}
 
 function prepareCmd(path, session, type, extraCmd = '') {
   // vim create a 4913 temp file
   // see: https://groups.google.com/forum/#!msg/vim_dev/sppdpElxY44/v9fOtS1ji-cJ
   if (/4913$/.test(path)) return
+  // vim backup file rejected
+  if (/.swp$/.test(path)) return
 
   const {
     'remote-path': remotePath,
+    'local-path': localPath,
     host,
     user,
     port,
@@ -29,19 +40,19 @@ function prepareCmd(path, session, type, extraCmd = '') {
 
   const sshpassCmd = `sshpass -p ${password} `
   let cmd = ''
+  const relativePath = getRelativePath(localPath, path)
   if (type === 'ssh') {
     cmd = `ssh -p ${port}  -o StrictHostKeyChecking=no ${user}@${host}`
   } else if (type === 'scp') {
     cmd = `scp -o StrictHostKeyChecking=no -P ${port} ${path} \
-    ${user}@${host}:${remotePath}/${path}`
+    ${user}@${host}:${remotePath}/${relativePath}`
   }
   // eslint-disable-next-line consistent-return
-  return sshpassCmd + cmd + extraCmd
+  return (sshpassCmd + cmd + extraCmd).replace('//', '/')
 }
 
 function onAdd(path, session) {
   const cmd = prepareCmd(path, session, 'scp')
-  console.log(cmd)
   execCmd(cmd, `[add file] in remote server \
 ${session['remote-path']}/${path}`)
 }
@@ -91,9 +102,10 @@ function initRemote(session) {
 
   const cmd = `sshpass -p ${password} scp -P ${port} -r ${localPath}\
     -o StrictHostKeyChecking=no ${user}@${host}:${newPath}`
-  logger.success("[warning]... it may taker a while cause some directory like \
-node_moules, vendor etc...")
-  logger.success("consider use rysnc in next release")
+  // eslint-disable-next-line no-multi-str
+  logger.success('[warning]... it may taker a while cause some directory like \
+node_moules, vendor etc...')
+  logger.success('consider use rysnc in next release')
   execCmd(cmd, '[init] remote server success')
 }
 
