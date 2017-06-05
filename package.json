@@ -1,6 +1,6 @@
 {
   "name": "easy-sync2",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "easy to sync your dev code to remote test server",
   "main": "index.js",
   "scripts": {
