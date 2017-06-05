@@ -15,11 +15,7 @@ function execCmd(cmd, successMsg) {
 }
 
 function getRelativePath(localPath, path) {
-  const lastDirName = localPath.substring(localPath.trim('/').lastIndexOf('/'))
-  const relativePath = path.substring(lastDirName.length
-    + path.lastIndexOf(lastDirName))
-
-  return relativePath
+  return path.replace(localPath.replace('~', '/root'), '')
 }
 
 function prepareCmd(path, session, type, extraCmd = '') {
@@ -53,36 +49,31 @@ function prepareCmd(path, session, type, extraCmd = '') {
 
 function onAdd(path, session) {
   const cmd = prepareCmd(path, session, 'scp')
-  execCmd(cmd, `[add file] in remote server \
-${session['remote-path']}/${path}`)
+  execCmd(cmd, `[add file] success ${path}`)
 }
 
 function onChange(path, session) {
   const cmd = prepareCmd(path, session, 'scp')
-  execCmd(cmd, `[change file] applied in remote server \
-${session['remote-path']}/${path}`)
+  execCmd(cmd, `[change file] success ${path}`)
 }
 
 function onAddDir(path, session) {
   const extraCmd = ` "mkdir -p ${session['remote-path']}/${path} "`
   const cmd = prepareCmd(path, session, 'ssh', extraCmd)
-  execCmd(cmd, ` [add directory] success in remote server \
-${session['remote-path']}/${path}`)
+  execCmd(cmd, ` [add directory] success ${path}`)
 }
 
 
 function onUnlink(path, session) {
   const extraCmd = ` " yes | rm  ${session['remote-path']}/${path} "`
   const cmd = prepareCmd(path, session, 'ssh', extraCmd)
-  execCmd(cmd, ` [delete file] in remote server \
-${session['remote-path']}/${path}`)
+  execCmd(cmd, ` [delete file] success ${path}`)
 }
 
 function onUnlinkDir(path, session) {
   const extraCmd = ` " rm -rf ${session['remote-path']}/${path} "`
   const cmd = prepareCmd(path, session, 'ssh', extraCmd)
-  execCmd(cmd, `[delete directory] in remote server \
-${session['remote-path']}/${path}`)
+  execCmd(cmd, `[delete directory] success ${path}`)
 }
 
 function initRemote(session) {
@@ -123,11 +114,9 @@ function sync(sessionName, init) {
     persistent: true,
     ignorePermissionErrors: true,
     ignoreInitial: true,
-    cwd: '.',
   })
 
   logger.success(`Watching path ${session['local-path']}`)
-
   watcher
     .on('change', (path) => {
       onChange(path, session)
