@@ -56,10 +56,14 @@ easy-sync -s -n dev  # sync code
 
 ## Examples
 
+### check easy-sync version
+```
+easy-sync -v|--version
+```
 
 ### watch and sync your code
 ``` bash
-easy-sync -s -n dev
+easy-sync -sn dev
 
 ```
 

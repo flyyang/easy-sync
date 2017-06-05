@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-
 const program = require('commander')
 const ssh = require('./src/ssh.js')
 const sync = require('./src/sync.js')
 const list = require('./src/list.js')
+const pjson = require('./package.json')
 
 program
-  .version('0.0.1')
+  .version(pjson.version)
   .option('-s, --sync', 'action: sync')
   .option('-S, --ssh', 'action: ssh')
   .option('-l, --list', 'list all session')
