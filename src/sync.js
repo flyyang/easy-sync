@@ -58,21 +58,24 @@ function onChange(path, session) {
 }
 
 function onAddDir(path, session) {
-  const extraCmd = ` "mkdir -p ${session['remote-path']}/${path} "`
-  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  const extraCmd = ` "mkdir -p ${session['remote-path']}/"`
+  const relativePath = getRelativePath(session['local-path'], path)
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, ` [add directory] success ${path}`)
 }
 
 
 function onUnlink(path, session) {
-  const extraCmd = ` " yes | rm  ${session['remote-path']}/${path} "`
-  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  const extraCmd = ` " yes | rm  ${session['remote-path']}/} "`
+  const relativePath = getRelativePath(session['local-path'], path)
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, ` [delete file] success ${path}`)
 }
 
 function onUnlinkDir(path, session) {
-  const extraCmd = ` " rm -rf ${session['remote-path']}/${path} "`
-  const cmd = prepareCmd(path, session, 'ssh', extraCmd)
+  const extraCmd = ` " rm -rf ${session['remote-path']}/} "`
+  const relativePath = getRelativePath(session['local-path'], path)
+  const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, `[delete directory] success ${path}`)
 }
 
