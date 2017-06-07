@@ -4,6 +4,15 @@ const ssh = require('./src/ssh.js')
 const sync = require('./src/sync.js')
 const list = require('./src/list.js')
 const pjson = require('./package.json')
+const logger = require('./src/logger.js')
+
+const snail = `                      ___
+                    // __\`\\  o o ~
+                   ll ( .) l_) ) \`
+                  __\\\\ \\__/   /
+ _________________/_/________/^^  sync your file at ease ...`
+
+logger.rainbow(snail)
 
 program
   .version(pjson.version)
@@ -15,7 +24,7 @@ program
   .on('--help', () => {
     console.log('   Examples')
     console.log('')
-    console.log('     $ easy-sync -s -n dev')
+    console.log('     $ easy-sync -sn dev')
   })
   .parse(process.argv)
 

@@ -29,8 +29,15 @@ function rainbow(msg) {
   console.log(colors.rainbow(msg))
   console.log('')
 }
+
+function warn(msg) {
+  console.log('')
+  console.log(colors.yellow(msg))
+  console.log('')
+}
 module.exports = {
   error,
   success,
   rainbow,
+  warn,
 }

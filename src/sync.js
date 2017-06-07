@@ -2,6 +2,9 @@ const chokidar = require('chokidar')
 const logger = require('./logger.js')
 const exec = require('child_process').exec
 const conf = require('./conf.js')
+const glob = require('glob')
+
+const ignorePattern = /(^|[/\\])\..|node_modules\/|vendor\/|.git\//
 
 function execCmd(cmd, successMsg) {
   if (!cmd) return
@@ -59,7 +62,7 @@ function onChange(path, session) {
 
 function onAddDir(path, session) {
   const extraCmd = ` "mkdir -p ${session['remote-path']}/`
-  const relativePath = getRelativePath(session['local-path'], path + '"')
+  const relativePath = getRelativePath(session['local-path'], `${path} "`)
   const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, ` [add directory] success ${path}`)
 }
@@ -67,40 +70,50 @@ function onAddDir(path, session) {
 
 function onUnlink(path, session) {
   const extraCmd = ` " yes | rm  ${session['remote-path']}/`
-  const relativePath = getRelativePath(session['local-path'], path + '"')
+  const relativePath = getRelativePath(session['local-path'], `${path} "`)
   const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, ` [delete file] success ${path}`)
 }
 
 function onUnlinkDir(path, session) {
   const extraCmd = ` " rm -rf ${session['remote-path']}/`
-  const relativePath = getRelativePath(session['local-path'], path + '"')
+  const relativePath = getRelativePath(session['local-path'], `${path} "`)
   const cmd = prepareCmd(path, session, 'ssh', extraCmd + relativePath)
   execCmd(cmd, `[delete directory] success ${path}`)
 }
 
 function initRemote(session) {
-  const {
-    'remote-path': remotePath,
-    'local-path': localPath,
-    host,
-    user,
-    port,
-    password,
-  } = session
+  glob(`${session['local-path']}/**/**`, { mark: true, dot: true },
+    (er, files) => {
+      const dir = []
+      const ignore = []
+      const path = []
+      files.forEach((file) => {
+        if (ignorePattern.test(file)) {
+          ignore.push(file)
+          return
+        }
+        if (/\/$/.test(file)) {
+          dir.push(file)
+        } else {
+          path.push(file)
+        }
+      })
 
-  const nomalizedRemotePath = remotePath.replace(/\/$/, '').replace('~', '/root')
-  const arr = nomalizedRemotePath.split('/')
-  arr.pop()
-  const newPath = arr.join('/')
-
-  const cmd = `sshpass -p ${password} scp -P ${port} -r ${localPath}\
-    -o StrictHostKeyChecking=no ${user}@${host}:${newPath}`
-  // eslint-disable-next-line no-multi-str
-  logger.success('[warning]... it may taker a while cause some directory like \
-node_moules, vendor etc...')
-  logger.success('consider use rysnc in next release')
-  execCmd(cmd, '[init] remote server success')
+      logger.success(`${files.length - dir.length} files found`)
+      logger.success(`${ignore.length} file ignored `)
+      logger.success(`${dir.length} directory found `)
+      logger.success(`${path.length} file will be transfered`)
+      if (path.length > 0) logger.warn('This may take a while')
+      dir.forEach((d) => {
+        onAddDir(d, session)
+      })
+      setTimeout(() => {
+        path.forEach((p) => {
+          onAdd(p, session)
+        })
+      }, 5000)
+    })
 }
 
 function sync(sessionName, init) {
