@@ -14,8 +14,7 @@ Below is how i do to copy the files to the remote test server:
 
 ``` bash
 scp -p 6666 test.php root@192.168.45.1:/var/www/app/
-
-## then enter the remote server password
+# then enter the remote server password
 ```
 The copy step will be verbose when you edit very often. Type the scp command,
 then input the server password. Sometimes unacceptable!
