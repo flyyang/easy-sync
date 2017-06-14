@@ -2,10 +2,13 @@
 
 This tool is used to sync your dev code to remote test server.
 
+![easy-sync](./easy-sync.gif)
+
 ## Why easy-sync?
 
 I'm a web developer. Sometimes wrote some `php` scripts or backend templates.
-These scripts have no need to compile, all i have to do is, copy to the test server, refresh the webpage or use `curl` to test the interface.
+These scripts have no need to compile, all i have to do is, copy to the test
+server, refresh the webpage or use `curl` to test the interface.
 
 Below is how i do to copy the files to the remote test server:
 
@@ -56,23 +59,28 @@ easy-sync -s -n dev  # sync code
 
 ## Examples
 
-### check easy-sync version
+### init remote server
+
 ```
-easy-sync -v|--version
+easy-sync -in dev
+```
+
+### check easy-sync version
+
+```
+easy-sync -V
 ```
 
 ### watch and sync your code
+
 ``` bash
 easy-sync -sn dev
-
 ```
 
 ### check sesion conf
 
 ```
-
 easy-snc -l [sessionName]
-
 ```
 
 ### get sshPass login cmd
