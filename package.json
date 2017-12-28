@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "lint": "./node_modules/eslint-watch/bin/esw --color -w",
+    "lint": "./node_modules/eslint-watch/bin/esw --color -w"
   },
   "repository": {
     "type": "git",
