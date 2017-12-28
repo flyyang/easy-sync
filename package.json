@@ -6,7 +6,6 @@
   "scripts": {
     "test": "test",
     "lint": "./node_modules/eslint-watch/bin/esw --color -w",
-    "preinstall": "git config user.email pengfei_yang@outlook.com"
   },
   "repository": {
     "type": "git",
